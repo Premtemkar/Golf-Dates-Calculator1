@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Golf Booking & Cancellation Checker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 480px;
+      padding: 2rem;
+      box-sizing: border-box;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #1a73e8;
+      font-weight: normal;
+    }
+    label {
+      display: block;
+      margin: 0.75rem 0 0.25rem;
+      font-size: 0.9rem;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.6rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 0.95rem;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #1a73e8;
+      box-shadow: 0 0 3px rgba(26,115,232,0.3);
+    }
+    .output {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #fafafa;
+      border-radius: 5px;
+      border: 1px solid #eee;
+    }
+    .output p {
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    .output strong {
+      width: 140px;
+      display: inline-block;
+      color: #555;
+    }
+    .disclaimer {
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      color: #555;
+      line-height: 1.5;
+      border-top: 1px solid #eee;
+      padding-top: 1rem;
+    }
+    .disclaimer h3 {
+      margin-bottom: 0.5rem;
+      color: #1a73e8;
+      font-weight: normal;
+    }
+    .disclaimer h4 {
+      margin: 0.75rem 0 0.25rem;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Golf Booking & Cancellation Checker</h2>
+
+    <label for="callingDate">Calling Date</label>
+    <input type="date" id="callingDate">
+
+    <label for="teeOffDate">Tee-Off Date</label>
+    <input type="date" id="teeOffDate">
+
+    <label for="gameType">Type of Game</label>
+    <select id="gameType">
+      <option value="">-- Select --</option>
+      <option value="Domestic Game">Domestic Game</option>
+      <option value="International Game">International Game</option>
+    </select>
+
+    <div class="output">
+      <p><strong>Booking Status:</strong><span id="status"> Input Pending</span></p>
+      <p><strong>Booking Window:</strong><span id="window"> Input Pending</span></p>
+      <p><strong>Cancellation Window:</strong><span id="cancelWindow"> Input Pending</span></p>
+      <p><strong>Cancellation Charge:</strong><span id="cancelCharge"> Input Pending</span></p>
+    </div>
+
+    <div class="disclaimer">
+      <h3>Disclaimers</h3>
+      <p><strong>GOLF</strong><br>
+      Only primary cardholders are eligible for complimentary game/lesson. Golf course has the right to deny/charge any other golfer using the booking on behalf of the primary cardholder at the golf course.<br>
+      Golf course slots are subject to availability.<br>
+      HDFC Bank does not hold any liability regarding timeliness concerns or the quality of service offered by the golf course.<br>
+      Please carry your photo ID proof for verification, which is mandatory at the golf course.</p>
+
+      <h4>Dress Code for Men</h4>
+      <p>Collared T-Shirt, Trousers & Shorts with belt loops, Sports & Golf shoes.<br>
+      Please carry water bottles and a cap (sunglasses optional).</p>
+
+      <h4>Dress Code for Women</h4>
+      <p>Collared T-Shirt with or without sleeves, Trousers, Shorts & Skirts, Sports & Golf shoes.<br>
+      Please carry water bottles and a cap (sunglasses optional).</p>
+
+      <p><strong>Note:</strong><br>
+      • Jeans, track pants, gym shorts, and collarless shirts are not permitted.<br>
+      • If customers are not in the golf dress code, they might not be allowed at the golf course even if the booking is confirmed.<br>
+      • Approvals/denials of golf bookings solely depend upon the golf course's discretion, booking policies & terms & conditions.</p>
+    </div>
+  </div>
+
+  <script>
+    const callingInput = document.getElementById('callingDate');
+    const teeOffInput = document.getElementById('teeOffDate');
+    const typeSelect = document.getElementById('gameType');
+    const statusEl = document.getElementById('status');
+    const windowEl = document.getElementById('window');
+    const cancelWindowEl = document.getElementById('cancelWindow');
+    const cancelChargeEl = document.getElementById('cancelCharge');
+
+    function formatDate(date) {
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      const yy = String(date.getFullYear()).slice(-2);
+      return `${mm}/${dd}/${yy}`;
+    }
+
+    function updateBooking() {
+      const cVal = callingInput.value;
+      const tVal = teeOffInput.value;
+      const type = typeSelect.value;
+
+      // Booking Window based on Calling Date and Type
+      if (cVal && type) {
+        const cDate = new Date(cVal);
+        let windowStart, windowEnd;
+        if (type === 'Domestic Game') {
+          windowStart = new Date(cDate); windowStart.setDate(windowStart.getDate() + 5);
+          windowEnd = new Date(cDate);   windowEnd.setDate(windowEnd.getDate() + 15);
+        } else {
+          windowStart = new Date(cDate); windowStart.setDate(windowStart.getDate() + 16);
+          windowEnd = new Date(cDate);   windowEnd.setDate(windowEnd.getDate() + 30);
+        }
+        windowEl.textContent = ` ${formatDate(windowStart)} to ${formatDate(windowEnd)}`;
+      } else {
+        windowEl.textContent = ' Input Pending';
+      }
+
+      // Status & Cancellation require Tee-Off Date
+      if (cVal && type && tVal) {
+        const cDate = new Date(cVal);
+        const tDate = new Date(tVal);
+        const diffDays = Math.round((tDate - cDate) / (1000 * 60 * 60 * 24));
+        let possible, cancelDate, cancelCharge;
+        // Calculate cancellation based on clear days
+        const clearDays = type === 'Domestic Game' ? 1 : 4;
+        if (type === 'Domestic Game') {
+          possible = diffDays >= 5 && diffDays <= 15;
+        } else {
+          possible = diffDays >= 16 && diffDays <= 31;
+        }
+        cancelDate = new Date(tDate);
+        cancelDate.setDate(cancelDate.getDate() - clearDays - 1);
+        cancelCharge = 'INR 500 per game';
+
+        statusEl.textContent = possible ? ' Booking Possible' : ' Booking Not Possible';
+        cancelWindowEl.textContent = possible ? ` Free until ${formatDate(cancelDate)}` : ' -';
+        cancelChargeEl.textContent = possible ? ` ${cancelCharge}` : ' -';
+      } else {
+        statusEl.textContent = ' Input Pending';
+        cancelWindowEl.textContent = ' Input Pending';
+        cancelChargeEl.textContent = ' Input Pending';
+      }
+    }
+
+    callingInput.addEventListener('change', updateBooking);
+    teeOffInput.addEventListener('change', updateBooking);
+    typeSelect.addEventListener('change', updateBooking);
+  </script>
+</html>
